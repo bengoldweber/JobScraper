@@ -133,9 +133,16 @@ def get_job(job_soup):
 	"""
 	:param job_soup:
 	"""
-
-
 	dict_jobs = {}
+	# dict_jobs['JobLink'] = job_soup.find("a", {"class": "jcs-JobTitle"})['href']
+	# dict_jobs['Title'] = job_soup.find("a", {"class": "jcs-JobTitle"}).get_text()
+	# dict_jobs['Company'] = job_soup.find("span", {"class": "companyName"}).get_text()
+	# dict_jobs['Location'] = job_soup.find("div", {"class": "companyLocation"}).get_text()
+	# dict_jobs['Salary'] = job_soup.find("div", {"class": "metadata salary-snippet-container"}).get_text()
+	# dict_jobs['Rating'] = job_soup.find("span", {"class": "ratingNumber"}).get_text()
+	# dict_jobs['JobSnipit'] = job_soup.find("div", {"class": "job-snippet"}).get_text()
+
+	# dict_jobs = {}
 
 	try:
 		dict_jobs['JobLink'] = job_soup.find("a", {"class": "jcs-JobTitle"})['href']
@@ -339,7 +346,7 @@ if __name__ == '__main__':
 	# dict_url['location'] = ""
 	dict_url['domain'] = "https://www.indeed.com"
 	starting_url = dict_url['domain'] + "/jobs?q=" + dict_url['job'] + "&l+=" + dict_url['location']
-	page_depth = 1
+	page_depth = 30
 	#url_list = get_pagination_urls(starting_url)
 	url_list = get_PaginationDepthList(dict_url, page_depth)
 
