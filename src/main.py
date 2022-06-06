@@ -315,7 +315,6 @@ if __name__ == '__main__':
 
 	JOBS_DETAILS_DDLS = ["""
 
-	-- auto-generated definition
 	create table Job_Details
 	(
 	    description BLOB,
