@@ -24,6 +24,7 @@ from collections import Counter
 import spacy
 import logging
 import os
+import sys
 
 
 
@@ -36,7 +37,6 @@ def check_tables_exist(table_name):
 	else:
 		logger.warning('Jobs Table doesnt exist')
 		return 1
-
 
 
 def pandas_to_DB_details(df):
@@ -241,7 +241,6 @@ def get_pagination_urls(url):
 			print("none returned")
 	return urls_list
 
-
 # grabbed_url = item.find("a")['href']
 # print(grabbed_url)
 
@@ -269,29 +268,20 @@ def generate_table_checks(table, DDL_List):
 		logger.info(f"{table} already exists, skipping DDL LIST execution")
 
 
-
 if __name__ == '__main__':
 	stop = stopwords.words('english')
-
-	logger = logging.getLogger()
-	logger.disabled = False
-
-	logging.root.setLevel(logging.NOTSET)
-
-	# The following line sets the root logger level as well.
-	# It's equivalent to both previous statements combined:
-	logging.basicConfig(level=logging.NOTSET)
-
-	# logging.basicConfig(filename="std.log",
-	#                     format='%(asctime)s %(message)s',
-	#                     filemode='w')
-
-	# instantiate logger
-	logger = logging.getLogger()
-	logger.disabled = False
+	logging.basicConfig(
+		level=logging.NOTSET,
+		format='%(asctime)s|%(name)s|%(levelname)s|%(message)s (%(filename)s:%(lineno)d)',
+		handlers=[
+			logging.FileHandler("std.log"),
+			logging.StreamHandler(sys.stdout)
+		]
+	)
 	logging.getLogger("urllib3").setLevel(logging.WARNING)
-	# Now we are going to Set the threshold of logger to DEBUG
-	# logger.setLevel(logging.DEBUG)
+	logger = logging.getLogger()
+	# create console handler with a higher log level
+	logger.disabled = False
 
 	database = "jobs_db.sqlite"
 
