@@ -253,8 +253,7 @@ def get_PaginationDepthList(dict_urlrules, depth):
 			url_string = dict_urlrules['domain'] + dict_urlrules['load_chunk'] + dict_urlrules['job'] + "&l+=" + dict_urlrules['location']
 		else:
 			url_string = dict_urlrules['domain'] + dict_urlrules['load_chunk'] + dict_urlrules['job'] + "&l+=" + dict_urlrules['location'] + start
-
-	urls_list.append(url_string)
+		urls_list.append(url_string)
 	return urls_list
 
 
@@ -290,7 +289,7 @@ if __name__ == '__main__':
 	# instantiate logger
 	logger = logging.getLogger()
 	logger.disabled = False
-
+	logging.getLogger("urllib3").setLevel(logging.WARNING)
 	# Now we are going to Set the threshold of logger to DEBUG
 	# logger.setLevel(logging.DEBUG)
 
@@ -339,24 +338,25 @@ if __name__ == '__main__':
 	generate_table_checks("Job_Details", JOBS_DETAILS_DDLS)
 
 	dict_url = {}
-	dict_url['job'] = "Machine+Learning"
+	dict_url['job'] = "Data Science"
+	dict_url['job'] = dict_url['job'].replace(" ", "%20")
 	dict_url['load_chunk'] = "/jobs?q="
 	dict_url['location'] = "Kensington%2C+MD"
 	# dict_url['location'] = ""
 	dict_url['domain'] = "https://www.indeed.com"
 	starting_url = dict_url['domain'] + "/jobs?q=" + dict_url['job'] + "&l+=" + dict_url['location']
-	page_depth = 30
+	page_depth = 1
 	#url_list = get_pagination_urls(starting_url)
 	url_list = get_PaginationDepthList(dict_url, page_depth)
-
 	for url in url_list:
+		logger.info("URL searching is " + str(url))
 		scrape_JobsListingPage(url)
 
 	cursor.execute("SELECT JobLink FROM JOBS")
 	rows = cursor.fetchall()
 	url_list = []
 	for row in rows:
-		url_list.append('https://www.indeed.com' + str(row[0]))
+		url_list.append(dict_url['domain'] + str(row[0]))
 
 	grab_bulk_job_details(url_list)
 	print("done")
