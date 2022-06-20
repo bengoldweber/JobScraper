@@ -55,7 +55,6 @@ def scrape_indeed(search_params):
 
 	logger.info("Pulling in Jobs table info....")
 	searchtime = search_params['SearchBatchTime']
-	print(searchtime)
 	rows = jbdb.query(f'SELECT JobLink FROM JOBS where SearchBatchTime="{searchtime}"')
 	#rows = jbdb.query(("Select JobLink FROM JOBS where JobLink not in (SELECT JD.JobLink FROM JOBS Join Job_Details JD on Jobs.JobLink = JD.JobLink)"))
 	logger.info("Jobs table Aquired....")
