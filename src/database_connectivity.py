@@ -1,7 +1,5 @@
-import main
-import sqlite3
-import main
 import logging
+import sqlite3
 
 DBconnectivity_logger = logging.getLogger('JobScraper.DBconnectivity')
 
@@ -34,7 +32,12 @@ class CoreDB():
 		"""commit changes to database"""
 		self.__db_connection.commit()
 
+
 class JobsDB(CoreDB):
+	"""
+	Database connection to the Job tables, as well as useful functions to format, insert and confirm tables exists.
+	Auto generates tables off of DDL if they dont.
+	"""
 
 	def __init__(self):
 		# Calling constructor of
@@ -44,6 +47,10 @@ class JobsDB(CoreDB):
 		url = ""
 
 	def check_tables_exist(self, table_name):
+		"""
+		:param table_name:
+		:return: a 1 query was successful, a 0 if it failed
+		"""
 		self.execute(f''' SELECT count(name) FROM sqlite_master WHERE type='table' AND name="{table_name}"''')
 		# if the count is 1, then table exists
 		if self.cursor.fetchone()[0] == 1:
@@ -123,7 +130,7 @@ class JobsDB(CoreDB):
 		self.generate_job_tables("Job_Details", JOBS_DETAILS_DDLS)
 		self.generate_job_tables("Job_SearchParams", JOBS_SEARCH_PARAM_DDLS)
 
-	def pandas_to_db_snipits(self, df, url, search_p ):
+	def pandas_to_db_snipits(self, df, url, search_p):
 		""" push pd df of job snipit info to the Jobs table """
 		for i, row in df.iterrows():
 			d_Link = row['JobLink'].replace("'", "''")
@@ -133,14 +140,18 @@ class JobsDB(CoreDB):
 			d_Salary = row['Salary'].replace("'", "''")
 			d_Snipit = row['JobSnipit'].replace("'", "''")
 			d_Rating = row['Rating'].replace("'", "''")
-			d_URL= url.replace("'", "''")
+			d_URL = url.replace("'", "''")
 			d_SearchParams = search_p['jobSearchIndex']
 			d_SearchBatchTime = search_p['SearchBatchTime']
-			#print(d_SearchParams)
-			values = "('" + d_Link + "', '" + d_Title + "', '" + d_Company + "', '" + d_Location + "', '" + d_Salary + "', '" + d_Snipit + "', '" + d_Rating + "', '" + d_URL + "', '" + str(d_SearchBatchTime) + "', '" + str(d_SearchParams) + "')"
-			insertInto = "INSERT OR IGNORE INTO JOBS (JobLink, Title, Company, Location, Salary, JobSnipit, Rating, SearchURL, SearchBatchTime, SearchParams) VALUES"
+			# print(d_SearchParams)
+			values = "('" + d_Link + "', '" + d_Title + "', '" + d_Company + "', '" + d_Location + "', '" + d_Salary \
+			         + \
+			         "', '" + d_Snipit + "', '" + d_Rating + "', '" + d_URL + "', '" + str(
+				d_SearchBatchTime) + "', '" + str(d_SearchParams) + "')"
+			insertInto = "INSERT OR IGNORE INTO JOBS (JobLink, Title, Company, Location, Salary, JobSnipit, Rating, " \
+			             "SearchURL, SearchBatchTime, SearchParams) VALUES"
 			sqlite_insert_query = insertInto + values
-			#print(sqlite_insert_query)
+			# print(sqlite_insert_query)
 			try:
 				self.execute(sqlite_insert_query)
 			except:
@@ -148,14 +159,20 @@ class JobsDB(CoreDB):
 		self.commit()
 
 	def pandas_to_db_details(self, df):
+		"""
+		:param df: Panads DF of Job Details to opuh
+		"""
 		DBconnectivity_logger.info("pushing data to able")
 		for i, row in df.iterrows():
 			d_JobLink = row['JobLink']
 			d_description = row['Description']
 			d_activity = row['Activity']
 			d_insights = row['Insights']
-			sqlite_insert_query = "INSERT OR IGNORE INTO JOB_Details (JobLink, Description, Activity, Insights) VALUES" + \
-			                      str("('" + d_JobLink + "', '" + d_description + "', '" + d_activity + "', '" + d_insights + "')")
+			sqlite_insert_query = "INSERT OR IGNORE INTO JOB_Details (JobLink, Description, Activity, Insights) " \
+			                      "VALUES" + \
+			                      str("('" + d_JobLink + "', '" + d_description + "', '" + d_activity + "', "
+			                                                                                            "'" +
+			                          d_insights + "')")
 			try:
 				self.execute(sqlite_insert_query)
 			except:

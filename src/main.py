@@ -30,6 +30,7 @@ import indeed_scrapers
 import database_connectivity
 import datetime
 
+
 def scrape_indeed(search_params):
 	"""Pulls in indeed job posting info to the Jobs and Jobs detail DB's
 	based on the paramaters passed as a dict called search params
@@ -50,23 +51,16 @@ def scrape_indeed(search_params):
 	for url in url_list:
 		logger.info("URL searching is " + str(url))
 		page_jobs, k_url = indeed_scrapers.scrape_JobsListingPage(url)
-		#print("key URL is " + k_url)
 		jbdb.pandas_to_db_snipits(page_jobs, k_url, search_params)
 
-	logger.info("Pulling in Jobs table info....")
 	searchtime = search_params['SearchBatchTime']
 	rows = jbdb.query(f'SELECT JobLink FROM JOBS where SearchBatchTime="{searchtime}"')
-	#rows = jbdb.query(("Select JobLink FROM JOBS where JobLink not in (SELECT JD.JobLink FROM JOBS Join Job_Details JD on Jobs.JobLink = JD.JobLink)"))
-	logger.info("Jobs table Aquired....")
 	url_list = []
 	for row in rows:
 		url_list.append(search_params['domain'] + str(row[0]))
 
-	logger.info("Key URLs appended....")
 	jobs_df = indeed_scrapers.grab_bulk_job_details(url_list)
-	logger.info("Pushing data to jobs DF....")
 	jbdb.pandas_to_db_details(jobs_df)
-	logger.info("Data pushed....")
 	logger.info("indeed scraping function compleated")
 
 
@@ -78,7 +72,7 @@ def set_loggers():
 		level=logging.NOTSET,
 		format='%(asctime)s|%(name)s|%(levelname)s|%(message)s (%(filename)s:%(lineno)d)',
 		handlers=[
-			logging.FileHandler("std.log"),
+			logging.FileHandler("App.log"),
 			logging.StreamHandler(sys.stdout)
 		]
 	)
@@ -87,12 +81,6 @@ def set_loggers():
 	# create console handler with a higher log level
 	logger.disabled = False
 	return logger
-
-
-def format_time():
-    t = datetime.datetime.now()
-    s = t.strftime('%Y-%m-%d %H:%M:%S.%f')
-    return s[:-4]
 
 
 if __name__ == '__main__':
@@ -109,13 +97,16 @@ if __name__ == '__main__':
 		             'domain': job_query[1],
 		             'searchdepth': job_query[3],
 		             'jobSearchIndex': job_query[4],
-		             'SearchBatchTime':format_time()
+		             'SearchBatchTime': generics.format_time()
 		             }
 		logger.info("running search based on search params " + str(jobs_dict))
 		scrape_indeed(jobs_dict)
 	# scrape_indeed(search_dict)
 	logger.info("program completed")
-	jbdb.__exit__()
+	jbdb.__exit__
+
+
+
 
 
 

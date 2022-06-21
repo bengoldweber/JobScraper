@@ -87,6 +87,7 @@ def get_job_titles(soup):
 		jobs_list.append(item.get_text())
 	return jobs_list
 
+
 def grab_job_details(url):
 	"""
 	:param url:
