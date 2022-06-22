@@ -25,9 +25,9 @@ import spacy
 import logging
 import os
 import sys
-import generics
-import indeed_scrapers
-import database_connectivity
+import src.generics as generics
+import src.indeed_scrapers as indeed_scrapers
+import src.database_connectivity as database_connectivity
 import datetime
 
 
@@ -70,7 +70,7 @@ def set_loggers():
 	"""
 	logging.basicConfig(
 		level=logging.NOTSET,
-		format='%(asctime)s|%(name)s|%(levelname)s|%(message)s (%(filename)s:%(lineno)d)',
+		format='%(asctime)s|%(name)s|%(levelname)s|%(message)s|(%(filename)s:%(lineno)d)',
 		handlers=[
 			logging.FileHandler("App.log"),
 			logging.StreamHandler(sys.stdout)

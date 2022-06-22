@@ -1,7 +1,7 @@
 # soup.select('a[class*=jcs-JobTitle]'):
-import generics
+import src.generics as generics
 import pandas as pd
-import database_connectivity
+import src.database_connectivity as database_connectivity
 import logging
 
 indeedscraper_logger = logging.getLogger('JobScraper.indeedscraper')
