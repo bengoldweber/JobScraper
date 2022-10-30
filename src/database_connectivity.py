@@ -166,8 +166,10 @@ class JobsDB(CoreDB):
 		for i, row in df.iterrows():
 			d_JobLink = row['JobLink']
 			d_description = row['Description']
-			d_activity = row['Activity']
-			d_insights = row['Insights']
+			# d_activity = row['Activity']
+			# d_insights = row['Insights']
+			d_activity = ""
+			d_insights = ""
 			sqlite_insert_query = "INSERT OR IGNORE INTO JOB_Details (JobLink, Description, Activity, Insights) " \
 			                      "VALUES" + \
 			                      str("('" + d_JobLink + "', '" + d_description + "', '" + d_activity + "', "

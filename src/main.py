@@ -31,6 +31,23 @@ import database_connectivity
 import datetime
 
 
+
+
+def JobScraperMonster(search_params):
+	""" pulls in monster job posting info to to the jobs and details DB
+
+	here is a sample search param dict
+
+		search_dict = {
+		'job':"Data Science".replace(" ", "%20"),
+		'load_chunk':'/jobs?q=',
+		'location':"Kensington%2C+MD",
+		'domain':"https://www.indeed.com",
+		'searchdepth':1
+	}
+	"""
+
+
 def scrape_indeed(search_params):
 	"""Pulls in indeed job posting info to the Jobs and Jobs detail DB's
 	based on the paramaters passed as a dict called search params
@@ -83,17 +100,21 @@ def set_loggers():
 	return logger
 
 
+
+
 if __name__ == '__main__':
-	stop = stopwords.words('english')
-	logger = set_loggers()
+
 	jbdb = database_connectivity.JobsDB()
 	jbdb.generate_job_tables_prechecks()
+	stop = stopwords.words('english')
+	logger = set_loggers()
+
 	# job_querys = jbdb.query("select * from Job_SearchParams")
 	jobs_query_results = jbdb.query("select * from Job_SearchParams")
 	for job_query in jobs_query_results:
 		jobs_dict = {'job': job_query[0].replace(" ", "%20"),
 		             'load_chunk': '/jobs?q=',
-		             'location': job_query[2].replace(" ", "%2C+"),
+		             'location': job_query[2],  #.replace(" ", "%2C+"),
 		             'domain': job_query[1],
 		             'searchdepth': job_query[3],
 		             'jobSearchIndex': job_query[4],

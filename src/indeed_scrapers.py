@@ -1,10 +1,18 @@
 # soup.select('a[class*=jcs-JobTitle]'):
+from bs4 import BeautifulSoup
+
 import generics
 import pandas as pd
 import database_connectivity
 import logging
 
 indeedscraper_logger = logging.getLogger('JobScraper.indeedscraper')
+
+def scrape_JobsListingPageSoup(url, soup):
+	soup = BeautifulSoup(soup, 'html.parser')
+	jobs_list = get_jobs(soup)
+	page_jobs = pd.DataFrame(jobs_list)
+	return page_jobs, url
 
 
 def scrape_JobsListingPage(url):
@@ -20,10 +28,11 @@ def get_jobs(soup):
 	"""
 	jobs_list = []
 	jobs_soup = soup.find_all('div', {'class': 'job_seen_beacon'})
+	print(soup)
 	for job_html in jobs_soup:
 		parsed_job = get_job(job_html)
 		jobs_list.append(parsed_job)
-
+	print(f"JOBS LIST IS {jobs_list}")
 	return jobs_list
 
 
@@ -95,6 +104,7 @@ def grab_job_details(url):
 	"""
 	jobs_details = {}
 	soup = generics.html_code(url)
+	print(soup)
 	jobs_details['JobLink'] = str(url)
 	try:
 		jobs_details['Description'] = str(soup.find("div", {"class": "jobsearch-jobDescriptionText"}).get_text())
@@ -134,13 +144,17 @@ def grab_bulk_job_details(url_list):
 		job_dict = grab_job_details(url)
 		job_list.append(job_dict)
 
+	print(job_list)
 	jobs_df = pd.DataFrame(job_list)
+	print(jobs_df)
+
 	clear_list = ['Insights', 'Activity']
 	indeedscraper_logger.info(f"Assembling insights")
-	for item in clear_list:
-		jobs_df[item] = jobs_df[item].str.replace('[', "", regex=False)
-		jobs_df[item] = jobs_df[item].str.replace(']', "", regex=False)
-		jobs_df[item] = jobs_df[item].str.replace("'", "", regex=False)
+	print(clear_list)
+	# for item in clear_list:
+	# 	jobs_df[item] = jobs_df[item].str.replace('[', "", regex=False)
+	# 	jobs_df[item] = jobs_df[item].str.replace(']', "", regex=False)
+	# 	jobs_df[item] = jobs_df[item].str.replace("'", "", regex=False)
 
 	jobs_df['Description'] = jobs_df['Description'].str.replace("'", "", regex=False)
 	jobs_df['JobLink'] = jobs_df['JobLink'].str.replace("https://www.indeed.com", "", regex=False)
@@ -170,3 +184,20 @@ def get_PaginationDepthList(dict_urlrules):
 
 
 
+def grab_bulk_job_details(driver, url_list):
+	job_list = []
+	for url in url_list:
+		indeedscraper_logger.info(f"Grabbing core details for {url}")
+		driver.get(url)
+		job_dict = grab_job_details(url)
+		job_list.append(job_dict)
+
+	jobs_df = pd.DataFrame(job_list)
+
+	clear_list = ['Insights', 'Activity']
+	indeedscraper_logger.info(f"Assembling insights")
+
+	jobs_df['Description'] = jobs_df['Description'].str.replace("'", "", regex=False)
+	jobs_df['JobLink'] = jobs_df['JobLink'].str.replace("https://www.indeed.com", "", regex=False)
+	indeedscraper_logger.info(f"Done grabbing core details")
+	return jobs_df
